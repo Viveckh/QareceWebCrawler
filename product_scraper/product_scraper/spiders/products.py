@@ -2,9 +2,6 @@ import os.path
 import scrapy
 from product_scraper.itemloaders import ProductItemLoader
 
-def extract_with_css(response, query):
-    return response.css(query).get(default='').strip()
-
 class ProductsSpider(scrapy.Spider):
     name = 'products-spider'
 
