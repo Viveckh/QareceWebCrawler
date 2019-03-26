@@ -1,6 +1,7 @@
 from scrapy.loader import ItemLoader
 from product_scraper.items import Product
 from scrapy.selector import Selector
+from product_scraper.utilities import extract_with_css
 import re
 import json
 
@@ -16,7 +17,7 @@ class ProductItemLoader(ItemLoader):
         data = json.loads(json_dump)
         
         loader.add_value('product_url', "https://www.macys.com" + data['product']['identifier']['productUrl'])
-        loader.add_value('product_id', data['product']['id'])
+        loader.add_value('product_id', 'macys-' + str(data['product']['id']))
         loader.add_value('sku', 'macys-' + str(data['product']['id']))
         loader.add_value('store', 'Macys')
         loader.add_value('name', data['product']['detail']['name'])
@@ -32,6 +33,10 @@ class ProductItemLoader(ItemLoader):
         
         loader.add_value('picture_urls', ','.join(picture_urls))
 
+        categories = []
+        for category in data['product']['relationships']['taxonomy']['categories']:
+            categories.append(category['name'])
+        
         '''
         loader.add_css('name', 'div[data-auto="product-title"] .product-brand-title a::text')
         loader.add_css('brand', 'div[data-auto="product-title"] .product-name::text')
@@ -42,6 +47,26 @@ class ProductItemLoader(ItemLoader):
 
     def parse_kylie_cosmetics(self, product_url, html_dump):
         loader = ProductItemLoader(item=Product(), selector=html_dump)
+
+        title = str(extract_with_css(html_dump, '.product-page #product-right h1[itemprop="name"]::text'))
+        name = title.split('|')[0].strip()
+        category = title.split('|')[1].strip()
+
+        loader.add_value('product_url', product_url)
+        loader.add_value('product_id', 'kyliecosmetics-' + title)
+        loader.add_value('sku', 'kyliecosmetics-' + title)
+        loader.add_value('store', 'Kylie Cosmetics')
+        loader.add_value('name', title)
+        loader.add_value('brand', 'Kylie Cosmetics')
+        loader.add_css('description', '#product-description .rte.maindescription')
+        loader.add_value('regular_price', float(extract_with_css(html_dump, '#product-description meta[itemprop="price"]::attr("content")')))
+
+        picture_urls = []
+        for image in html_dump.css('#thumbnail-gallery div.slide'):
+            picture_url = extract_with_css(image, 'a::attr("href")')
+            picture_urls.append('https:' + str(picture_url))
+
+        loader.add_value('picture_urls', ','.join(picture_urls))
 
         return loader.load_item()
     

@@ -15,9 +15,7 @@ class ProductScraperItem(scrapy.Item):
 
 class Product(scrapy.Item):
     product_url = scrapy.Field()
-    product_id = scrapy.Field(
-        output_processor=to_int
-    )
+    product_id = scrapy.Field()
     sku = scrapy.Field(
         output_processor=clean_text
     )
@@ -31,3 +29,5 @@ class Product(scrapy.Item):
         output_processor=to_int
     )
     picture_urls = scrapy.Field()
+    category = scrapy.Field()
+    subcategory = scrapy.Field()
