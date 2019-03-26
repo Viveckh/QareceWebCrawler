@@ -22,7 +22,7 @@ NEWSPIDER_MODULE = 'product_scraper.spiders'
 ROBOTSTXT_OBEY = True
 
 # CSV settings
-CSV_DELIMITER= "|"
+CSV_DELIMITER= ","
 
 # CSV output folder
 CSV_OUTPUT_FOLDER = "product_scraper/output/"

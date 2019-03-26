@@ -28,7 +28,7 @@ class ProductItemLoader(ItemLoader):
             picture_url = data['product']['urlTemplate']['product'] + image['filePath'] + '?op_sharpen=1&wid=1230&hei=1500'
             picture_urls.append(picture_url)
         
-        loader.add_value('picture_urls', ','.join(picture_urls))
+        loader.add_value('picture_urls', '|'.join(picture_urls))
 
         '''
         loader.add_css('name', 'div[data-auto="product-title"] .product-brand-title a::text')
