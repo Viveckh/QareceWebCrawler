@@ -18,11 +18,16 @@ class Product(scrapy.Item):
     product_id = scrapy.Field(
         output_processor=to_int
     )
+    sku = scrapy.Field(
+        output_processor=clean_text
+    )
+    store = scrapy.Field(
+        output_processor=clean_text
+    )
     name = scrapy.Field()
     brand = scrapy.Field()
     description = scrapy.Field()
-    marked_price = scrapy.Field()
-    sale_price = scrapy.Field(
+    regular_price = scrapy.Field(
         output_processor=to_int
     )
     picture_urls = scrapy.Field()
