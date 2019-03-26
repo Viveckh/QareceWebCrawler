@@ -5,6 +5,7 @@ from product_scraper.itemloaders import ProductItemLoader
 class ProductsSpider(scrapy.Spider):
     name = 'products-spider'
 
+    productItemLoader = ProductItemLoader()
     with open(os.path.dirname(__file__) + "/../input/urls.txt", "rt") as f:
         start_urls = [url.strip() for url in f.readlines()]
 
@@ -12,6 +13,8 @@ class ProductsSpider(scrapy.Spider):
         request_url = str(response.request.url).lower()
         
         if 'macys.com' in request_url: 
-            yield ProductItemLoader.parse_macys(self, product_url=request_url, html_dump=response)
+            yield self.productItemLoader.parse_macys(product_url=request_url, html_dump=response)
         elif 'kyliecosmetics.com' in request_url:
-            yield ProductItemLoader.parse_kylie_cosmetics(self, product_url=request_url, html_dump=response)
+            yield self.productItemLoader.parse_kylie_cosmetics(product_url=request_url, html_dump=response)
+        elif 'sephora.com' in request_url:
+            yield self.productItemLoader.parse_sephora(product_url=request_url, html_dump=response)

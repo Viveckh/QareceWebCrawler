@@ -70,3 +70,61 @@ class ProductItemLoader(ItemLoader):
 
         return loader.load_item()
     
+    def parse_sephora(self, product_url, html_dump):
+        loader = ProductItemLoader(item=Product(), selector=html_dump)
+
+        hxs = Selector(html_dump)
+        json_dump = hxs.select('//script[contains(@id, "linkJSON")]/text()').extract()[0]
+        data = json.loads(json_dump)
+
+        # Sephora returns a list where one of the indexes contains details about the product
+        product = None
+        for obj in data:
+            if 'RegularProductTop' in obj['class']:
+                product = obj['props']['currentProduct']   
+                break
+        
+        if product is not None:
+            loader.add_value('product_url', product['fullSiteProductUrl'])
+            loader.add_value('product_id', 'sephora-' + str(product['currentSku']['skuId']))
+            loader.add_value('sku', 'sephora-' + str(product['currentSku']['skuId']))
+            loader.add_value('store', 'Sephora')
+            loader.add_value('name', product['displayName'])
+            loader.add_value('brand', product['brand']['displayName'])
+            loader.add_value('description', product['longDescription'])
+            loader.add_value('regular_price', float(str(product['currentSku']['listPrice']).replace('$', '')))
+
+            picture_urls = [ str(product['fullSiteHostName']) + str(product['currentSku']['skuImages']['image1500']) ]
+            if 'alternateImages' in product['currentSku']:
+                for image in product['currentSku']['alternateImages']:
+                    picture_urls.append(str(product['fullSiteHostName']) + str(image['image1500']))
+                
+            loader.add_value('picture_urls', ','.join(picture_urls))
+
+            categories = self.recursive_sephora_category_builder(product['parentCategory'])
+            print(categories)
+        return loader.load_item()
+
+
+    """
+        The nested object structure for categories is built from child to parent, with topmost parent being at the leaf node
+        Example order of object to recurse: Eye Sets > Eyes > Makeup
+        Hence it has to be built in a reverse order, starting from the leaf node.
+    """
+    def recursive_sephora_category_builder(self, obj):
+        # Recursive condition, keep recursing until you get to the base condition
+        if 'parentCategory' in obj:
+            # The recursive function below would have built the array upto this point, starting from bottom up 
+            categories = self.recursive_sephora_category_builder(obj['parentCategory'])
+            #print(categories)
+
+            # Add the category name for this level and return, so the chain continues
+            categories.append(obj['displayName'])
+            return categories
+        
+        # Base condition, this is hit only when you get to the leaf node without any further parentCategory nodes
+        if 'displayName' in obj:
+            return [obj['displayName']]
+
+
+
