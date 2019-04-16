@@ -125,7 +125,7 @@ class ProductItemLoader(ItemLoader):
             shared_product_details['wp_visibility'] = 'visible'
             if product['variationType'] != 'None':
                 shared_product_details['attributes'] = {}
-                shared_product_details['attributes'][product['variationType']] = [obj['variationValue'] for obj in product['regularChildSkus'] if 'variationValue' in obj and obj['variationType'] == product['variationType']]
+                shared_product_details['attributes'][product['variationType']] = [(obj.get('variationValue', '') + ' ' + obj.get('variationDesc', '')) for obj in product['regularChildSkus'] if obj['variationType'] == product['variationType']]
             """
             loader[0].add_value('product_url', product['fullSiteProductUrl'])
             loader[0].add_value('product_id', 'sephora-' + str(product['currentSku']['skuId']))
@@ -180,8 +180,10 @@ class ProductItemLoader(ItemLoader):
         if is_parent:
             loader.add_value('sku', parent_details['sku'])
             loader.add_value('wp_product_type', 'variable' if is_variable else 'simple')
+            loader.add_value('description', parent_details['description'])
+            loader.add_value('short_description', parent_details['short_description'])
 
-            # Get all the keys of the attributes if it exists
+            # Get all the keys of the attributes if it exists and fill the attribute details for parent (which includes all possible values)
             if 'attributes' in parent_details:
                 variation_attributes = list(parent_details['attributes'].keys())
 
@@ -192,16 +194,26 @@ class ProductItemLoader(ItemLoader):
                     loader.add_value(field_name_part + '_visible', 1)
                     loader.add_value(field_name_part + '_global', 1)
                     if attribute == sku_obj['variationType']:
-                        loader.add_value(field_name_part + '_default', sku_obj['variationValue'])
+                        loader.add_value(field_name_part + '_default', sku_obj.get('variationValue', '') + ' ' + sku_obj.get('variationDesc', ''))
         else:
             loader.add_value('parent_sku', parent_details['sku'])
             loader.add_value('wp_product_type', 'variation')
 
+            # Fill up the attributes
+            if 'attributes' in parent_details:
+                variation_attributes = list(parent_details['attributes'].keys())
+
+                for index, attribute in enumerate(variation_attributes):
+                    field_name_part = 'attribute' + str(index+1)
+                    loader.add_value(field_name_part + '_name', attribute)
+                    loader.add_value(field_name_part + '_values', sku_obj.get('variationValue', '') + ' ' + sku_obj.get('variationDesc', ''))
+                    loader.add_value(field_name_part + '_visible', 1)
+                    loader.add_value(field_name_part + '_global', 1)
+
+
         loader.add_value('store', parent_details['store'])
         loader.add_value('name', parent_details['name'])
         loader.add_value('brand', parent_details['brand'])
-        loader.add_value('description', parent_details['description'])
-        loader.add_value('short_description', parent_details['short_description'])
         loader.add_value('tax_status', parent_details['tax_status'])
         loader.add_value('in_stock', parent_details['in_stock'])
         loader.add_value('backorders_allowed', parent_details['backorders_allowed'])
