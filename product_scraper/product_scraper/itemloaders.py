@@ -117,8 +117,15 @@ class ProductItemLoader(ItemLoader):
             shared_product_details['brand'] = product['brand']['displayName']
             shared_product_details['description'] = product['longDescription']
             shared_product_details['short_description'] = product['quickLookDescription']
-
-
+            shared_product_details['tax_status'] = 'taxable'
+            shared_product_details['in_stock'] = 1
+            shared_product_details['backorders_allowed'] = 0
+            shared_product_details['wp_published'] = 1
+            shared_product_details['wp_featured'] = 0
+            shared_product_details['wp_visibility'] = 'visible'
+            if product['variationType'] != 'None':
+                shared_product_details['attributes'] = {}
+                shared_product_details['attributes'][product['variationType']] = [obj['variationValue'] for obj in product['regularChildSkus'] if 'variationValue' in obj and obj['variationType'] == product['variationType']]
             """
             loader[0].add_value('product_url', product['fullSiteProductUrl'])
             loader[0].add_value('product_id', 'sephora-' + str(product['currentSku']['skuId']))
@@ -129,6 +136,7 @@ class ProductItemLoader(ItemLoader):
             loader[0].add_value('description', product['longDescription'])
             loader[0].add_value('short_description', product['quickLookDescription'])
             """
+
             sephora_category_list = self.recursive_sephora_category_builder(product['parentCategory'])
             # original_price_in_usd = float(str(product['currentSku']['listPrice']).replace('$', ''))
             
@@ -172,6 +180,19 @@ class ProductItemLoader(ItemLoader):
         if is_parent:
             loader.add_value('sku', parent_details['sku'])
             loader.add_value('wp_product_type', 'variable' if is_variable else 'simple')
+
+            # Get all the keys of the attributes if it exists
+            if 'attributes' in parent_details:
+                variation_attributes = list(parent_details['attributes'].keys())
+
+                for index, attribute in enumerate(variation_attributes):
+                    field_name_part = 'attribute' + str(index+1)
+                    loader.add_value(field_name_part + '_name', attribute)
+                    loader.add_value(field_name_part + '_values', ','.join(parent_details['attributes'][attribute]))
+                    loader.add_value(field_name_part + '_visible', 1)
+                    loader.add_value(field_name_part + '_global', 1)
+                    if attribute == sku_obj['variationType']:
+                        loader.add_value(field_name_part + '_default', sku_obj['variationValue'])
         else:
             loader.add_value('parent_sku', parent_details['sku'])
             loader.add_value('wp_product_type', 'variation')
@@ -181,6 +202,12 @@ class ProductItemLoader(ItemLoader):
         loader.add_value('brand', parent_details['brand'])
         loader.add_value('description', parent_details['description'])
         loader.add_value('short_description', parent_details['short_description'])
+        loader.add_value('tax_status', parent_details['tax_status'])
+        loader.add_value('in_stock', parent_details['in_stock'])
+        loader.add_value('backorders_allowed', parent_details['backorders_allowed'])
+        loader.add_value('wp_published', parent_details['wp_published'])
+        loader.add_value('wp_featured', parent_details['wp_featured'])
+        loader.add_value('wp_visibility', parent_details['wp_visibility'])
 
         original_price_in_usd = float(str(sku_obj['listPrice']).replace('$', ''))
 
@@ -194,12 +221,17 @@ class ProductItemLoader(ItemLoader):
         loader.add_value('final_price_in_usd', final_price_in_usd)
         loader.add_value('final_price_in_npr', final_price_in_npr)
 
-        picture_urls = [ "https://www.sephora.com" + str(sku_obj['skuImages']['image1500']) ]
+        base_image_url = "https://www.sephora.com"
+        picture_urls = [ base_image_url + str(sku_obj['skuImages']['image1500']) ]
         if 'alternateImages' in sku_obj:
             for image in sku_obj['alternateImages']:
-                picture_urls.append( "https://www.sephora.com" + str(image['image1500']))
+                picture_urls.append(base_image_url + str(image['image1500']))
             
         loader.add_value('picture_urls', ','.join(picture_urls))
+
+        # Handle variations
+        #loader.add_value('swatch_url', base_image_url + str(sku_obj['smallImage']))
+
         loader.load_item()
         return loader
 

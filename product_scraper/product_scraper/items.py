@@ -54,6 +54,7 @@ class Product(scrapy.Item):
         output_processor=to_int
     )
     picture_urls = scrapy.Field()
+    swatch_url = scrapy.Field()
     tax_status = scrapy.Field()
     in_stock = scrapy.Field(
         output_processor=to_int
@@ -63,18 +64,30 @@ class Product(scrapy.Item):
     )
     attribute1_name = scrapy.Field()
     attribute1_values = scrapy.Field()
-    attribute1_visible = scrapy.Field()
-    attribute1_global = scrapy.Field()
+    attribute1_visible = scrapy.Field(
+        output_processor=to_int
+    )
+    attribute1_global = scrapy.Field(
+        output_processor=to_int
+    )
     attribute1_default = scrapy.Field()
     attribute2_name = scrapy.Field()
     attribute2_values = scrapy.Field()
-    attribute2_visible = scrapy.Field()
-    attribute2_global = scrapy.Field()
+    attribute2_visible = scrapy.Field(
+        output_processor=to_int
+    )
+    attribute2_global = scrapy.Field(
+        output_processor=to_int
+    )
     attribute2_default = scrapy.Field()
     attribute3_name = scrapy.Field()
     attribute3_values = scrapy.Field()
-    attribute3_visible = scrapy.Field()
-    attribute3_global = scrapy.Field()
+    attribute3_visible = scrapy.Field(
+        output_processor=to_int
+    )
+    attribute3_global = scrapy.Field(
+        output_processor=to_int
+    )
     attribute3_default = scrapy.Field()
     wp_product_type = scrapy.Field()
     wp_published = scrapy.Field(
@@ -84,7 +97,4 @@ class Product(scrapy.Item):
         output_processor=to_int
     )
     wp_visibility = scrapy.Field()
-    wp_sold_individually = scrapy.Field(
-        output_processor=to_int
-    )
     
