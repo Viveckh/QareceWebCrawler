@@ -93,8 +93,7 @@ class ProductItemLoader(ItemLoader):
         return loader.load_item()
     
     def parse_sephora(self, product_url, html_dump):
-        loader = []
-        #loader.append(ProductItemLoader(item=Product(), selector=html_dump))
+        loaders = []
 
         hxs = Selector(html_dump)
         json_dump = hxs.select('//script[contains(@id, "linkJSON")]/text()').extract()[0]
@@ -126,52 +125,21 @@ class ProductItemLoader(ItemLoader):
             if product['variationType'] != 'None':
                 shared_product_details['attributes'] = {}
                 shared_product_details['attributes'][product['variationType']] = [(obj.get('variationValue', '') + ' ' + obj.get('variationDesc', '')) for obj in product['regularChildSkus'] if obj['variationType'] == product['variationType']]
-            """
-            loader[0].add_value('product_url', product['fullSiteProductUrl'])
-            loader[0].add_value('product_id', 'sephora-' + str(product['currentSku']['skuId']))
-            loader[0].add_value('sku', 'sephora-' + str(product['currentSku']['skuId']))
-            loader[0].add_value('store', 'Sephora')
-            loader[0].add_value('name', product['displayName'])
-            loader[0].add_value('brand', product['brand']['displayName'])
-            loader[0].add_value('description', product['longDescription'])
-            loader[0].add_value('short_description', product['quickLookDescription'])
-            """
 
             sephora_category_list = self.recursive_sephora_category_builder(product['parentCategory'])
-            # original_price_in_usd = float(str(product['currentSku']['listPrice']).replace('$', ''))
             
             if 'regularChildSkus' in product:
                 is_variable_product = True
             else:
                 is_variable_product = False
 
-            loader.append(self.gather_sephora_variation(sku_obj=product['currentSku'], parent_details=shared_product_details, category_list=sephora_category_list, is_parent=True, is_variable=is_variable_product))
+            loaders.append(self.gather_sephora_variation(sku_obj=product['currentSku'], parent_details=shared_product_details, category_list=sephora_category_list, is_parent=True, is_variable=is_variable_product))
 
             if is_variable_product:
                 for child_sku_obj in product['regularChildSkus']:
-                    loader.append(self.gather_sephora_variation(sku_obj=child_sku_obj, parent_details=shared_product_details, category_list=sephora_category_list, is_parent=False, is_variable=True))
+                    loaders.append(self.gather_sephora_variation(sku_obj=child_sku_obj, parent_details=shared_product_details, category_list=sephora_category_list, is_parent=False, is_variable=True))
 
-            """
-            category, weight, profit_margin_rate, estimated_shipping_cost_in_usd, estimated_profit_in_usd, final_price_in_usd, final_price_in_npr = self.map_and_calculate(store='Sephora', category_list=sephora_category_list, original_price_in_usd=original_price_in_usd)
-            loader[0].add_value('category', category)
-            loader[0].add_value('weight', weight)
-            loader[0].add_value('profit_margin_rate', profit_margin_rate)
-            loader[0].add_value('original_price_in_usd', original_price_in_usd)
-            loader[0].add_value('estimated_shipping_cost_in_usd', estimated_shipping_cost_in_usd)
-            loader[0].add_value('estimated_profit_in_usd', estimated_profit_in_usd)
-            loader[0].add_value('final_price_in_usd', final_price_in_usd)
-            loader[0].add_value('final_price_in_npr', final_price_in_npr)
-
-            picture_urls = [ str(product['fullSiteHostName']) + str(product['currentSku']['skuImages']['image1500']) ]
-            if 'alternateImages' in product['currentSku']:
-                for image in product['currentSku']['alternateImages']:
-                    picture_urls.append(str(product['fullSiteHostName']) + str(image['image1500']))
-                
-            loader[0].add_value('picture_urls', ','.join(picture_urls))
-
-            """
-        #loader[0].load_item()
-        return loader
+        return loaders
 
     def gather_sephora_variation(self, sku_obj, parent_details, category_list, is_parent, is_variable):
         loader = ProductItemLoader(item=Product(), selector=sku_obj)
@@ -215,7 +183,7 @@ class ProductItemLoader(ItemLoader):
         loader.add_value('name', parent_details['name'])
         loader.add_value('brand', parent_details['brand'])
         loader.add_value('tax_status', parent_details['tax_status'])
-        loader.add_value('in_stock', parent_details['in_stock'])
+        loader.add_value('in_stock', 0 if sku_obj['isOutOfStock'] else 1)
         loader.add_value('backorders_allowed', parent_details['backorders_allowed'])
         loader.add_value('wp_published', parent_details['wp_published'])
         loader.add_value('wp_featured', parent_details['wp_featured'])
