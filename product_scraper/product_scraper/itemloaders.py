@@ -15,47 +15,6 @@ class ProductItemLoader(ItemLoader):
     category_mapping_df.fillna(value='', inplace=True)
     profit_margin_mapping_df.fillna(value='', inplace=True)
 
-    def parse_macys(self, product_url, html_dump):
-        loader = ProductItemLoader(item=Product(), selector=html_dump)
-
-        hxs = Selector(html_dump)
-        json_dump = hxs.select('//script[contains(@data-bootstrap, "feature/product")]/text()').extract()[0]
-        data = json.loads(json_dump)
-        
-        loader.add_value('product_url', "https://www.macys.com" + data['product']['identifier']['productUrl'])
-        loader.add_value('product_id', 'macys-' + str(data['product']['id']))
-        loader.add_value('sku', 'macys-' + str(data['product']['id']))
-        loader.add_value('store', 'Macys')
-        loader.add_value('name', data['product']['detail']['name'])
-        loader.add_value('brand', data['product']['detail']['brand']['name'])
-        loader.add_css('description', 'div[data-section="product-details"] div[data-el="product-details"]')
-
-        macys_category_list = []
-        for category in data['product']['relationships']['taxonomy']['categories']:
-            macys_category_list.append(category['name'])
-
-        original_price_in_usd = float(data['product']['pricing']['price']['tieredPrice'][0]['values'][0]['value'])
-        
-        category, weight, profit_margin_rate, estimated_shipping_cost_in_usd, estimated_profit_in_usd, final_price_in_usd, final_price_in_npr = self.map_and_calculate(store='Macys', category_list=macys_category_list, original_price_in_usd=original_price_in_usd)
-        loader.add_value('category', category)
-        loader.add_value('weight', weight)
-        loader.add_value('profit_margin_rate', profit_margin_rate)
-        loader.add_value('original_price_in_usd', original_price_in_usd)
-        loader.add_value('estimated_shipping_cost_in_usd', estimated_shipping_cost_in_usd)
-        loader.add_value('estimated_profit_in_usd', estimated_profit_in_usd)
-        loader.add_value('final_price_in_usd', final_price_in_usd)
-        loader.add_value('final_price_in_npr', final_price_in_npr)
-
-        picture_urls = []
-        for image in data['product']['imagery']['images']:
-            # Appending the query params to the image url is important, without it a low quality version is shown            
-            picture_url = data['product']['urlTemplate']['product'] + image['filePath'] + '?op_sharpen=1&wid=1230&hei=1500'
-            picture_urls.append(picture_url)
-        
-        loader.add_value('picture_urls', ','.join(picture_urls))
-    
-        return loader.load_item()
-
     def parse_kylie_cosmetics(self, product_url, html_dump):
         loader = ProductItemLoader(item=Product(), selector=html_dump)
 
@@ -91,7 +50,159 @@ class ProductItemLoader(ItemLoader):
         loader.add_value('picture_urls', ','.join(picture_urls))
 
         return loader.load_item()
-    
+
+    def parse_macys(self, product_url, html_dump):
+        loaders = []
+
+        hxs = Selector(html_dump)
+        json_dump = hxs.select('//script[contains(@data-bootstrap, "feature/product")]/text()').extract()[0]
+        data = json.loads(json_dump)
+
+        # Pretty much all the info we need is within the product node, so lets take that
+        product = data['product']
+
+        if product is not None:
+            shared_product_details = {}
+            shared_product_details['product_url'] = "https://www.macys.com" + product['identifier']['productUrl']
+            shared_product_details['product_id'] = 'macys-' + str(product['id'])
+            shared_product_details['sku'] = 'macys-' + str(product['id'])
+            shared_product_details['store'] = 'Macys'
+            shared_product_details['name'] = product['detail']['name']
+            shared_product_details['brand'] = product['detail']['brand']['name']
+            shared_product_details['description'] = '<p>' + product['detail']['description'] + '</p>' + (('<ul><li>' + '</li><li>'.join(list(product['detail']['bulletText'])) + '</li><ul>') if 'bulletText' in product['detail'] else '')
+            shared_product_details['short_description'] = product['detail']['description']
+            shared_product_details['tax_status'] = 'taxable'
+            shared_product_details['in_stock'] = 1
+            shared_product_details['backorders_allowed'] = 0
+            shared_product_details['wp_published'] = 1
+            shared_product_details['wp_featured'] = 0
+            shared_product_details['wp_visibility'] = 'visible'
+            shared_product_details['base_image_urls'] = product['urlTemplate']
+            upcs_list = dict(product['relationships']['upcs']).keys()
+            if len(upcs_list) > 1:
+                is_variable_product = True
+                shared_product_details['attributes'] = {}
+                # Extract all keys from the traits node, exclude keys that are only a mapping and not an attribute
+                temp_valid_attrs = list(filter(lambda val: val != 'traitsMaps', dict(product['traits']).keys()))
+                shared_product_details['attributes_list'] = temp_valid_attrs
+                for attr in temp_valid_attrs:
+                    shared_product_details['attributes'][attr] = product['traits'][attr]
+            else:
+                is_variable_product = False
+            
+            # Retrieve categories
+            macys_category_list = []
+            for category in data['product']['relationships']['taxonomy']['categories']:
+                macys_category_list.append(category['name'])
+
+            # The price will be the same for all variations of a product
+            prices = [float(obj['value']) for obj in data['product']['pricing']['price']['tieredPrice'][0]['values']]
+            shared_product_details['original_price_in_usd'] = max(prices)
+            
+            loaders.append(self.gather_macys_variation(sku_obj=product, parent_details=shared_product_details, category_list=macys_category_list, is_parent=True, is_variable=is_variable_product))
+
+            if is_variable_product:
+                for upcs in upcs_list:
+                    child_sku_obj = product['relationships']['upcs'][upcs]
+                    loaders.append(self.gather_macys_variation(sku_obj=child_sku_obj, parent_details=shared_product_details, category_list=macys_category_list, is_parent=False, is_variable=True))
+
+        return loaders
+
+
+    def gather_macys_variation(self, sku_obj, parent_details, category_list, is_parent, is_variable):
+        loader = ProductItemLoader(item=Product(), selector=sku_obj)
+
+        base_image_url = parent_details['base_image_urls']['product']
+        picture_urls = []
+        variation_attributes = parent_details.get('attributes_list', [])
+
+        loader.add_value('product_url', parent_details['product_url'])
+        if is_parent:
+            loader.add_value('sku', parent_details['sku'])
+            loader.add_value('wp_product_type', 'variable' if is_variable else 'simple')
+            loader.add_value('description', parent_details['description'])
+            loader.add_value('short_description', parent_details['short_description'])
+
+            for image in sku_obj['imagery']['images']:
+                picture_urls.append(base_image_url + str(image['filePath']) + '?op_sharpen=1&wid=1230&hei=1500')
+
+            # Get all the keys of the attributes if it exists and fill the attribute details for parent (which includes all possible values)
+            if 'attributes' in parent_details:
+                for index, attribute in enumerate(variation_attributes):
+                    field_name_part = 'attribute' + str(index+1)
+                    loader.add_value(field_name_part + '_name', attribute)
+                    loader.add_value(field_name_part + '_visible', 1)
+                    loader.add_value(field_name_part + '_global', 1)
+                    if attribute == 'colors':
+                        # Get the list of color names first
+                        all_color_ids = dict(parent_details['attributes']['colors']['colorMap']).keys()
+                        all_colors = []
+                        for color in all_color_ids:
+                            all_colors.append(parent_details['attributes']['colors']['colorMap'][color]['name'])
+
+                        loader.add_value(field_name_part + '_values', ','.join(all_colors))
+                        selected_color = str(parent_details['attributes']['colors']['selectedColor'])
+                        loader.add_value(field_name_part + '_default', parent_details['attributes']['colors']['colorMap'][selected_color]['name'])
+                    elif attribute == 'sizes':
+                        # Get the list of size names first
+                        all_size_ids = dict(parent_details['attributes']['sizes']['sizeMap']).keys()
+                        all_sizes = []
+                        for size in all_size_ids:
+                            all_sizes.append(parent_details['attributes']['sizes']['sizeMap'][size]['name'])
+
+                        loader.add_value(field_name_part + '_values', ','.join(all_sizes))
+                        loader.add_value(field_name_part + '_default', '')
+        else:
+            loader.add_value('parent_sku', parent_details['sku'])
+            loader.add_value('wp_product_type', 'variation')
+
+            # Fill up the attributes
+            if 'attributes' in parent_details:
+                for index, attribute in enumerate(variation_attributes):
+                    field_name_part = 'attribute' + str(index+1)
+                    loader.add_value(field_name_part + '_name', attribute)
+                    loader.add_value(field_name_part + '_visible', 1)
+                    loader.add_value(field_name_part + '_global', 1)
+                    if attribute == 'colors':
+                        selected_color = str(sku_obj['traits']['colors']['selectedColor'])
+                        loader.add_value(field_name_part + '_values', parent_details['attributes']['colors']['colorMap'][selected_color]['name'])
+
+                        # The images for the variations are listed in color attribute
+                        for image in parent_details['attributes']['colors']['colorMap'][selected_color]['imagery']['images']:
+                            picture_urls.append(base_image_url + str(image['filePath']) + '?op_sharpen=1&wid=1230&hei=1500')
+                    elif attribute == 'sizes':
+                        selected_size = str(sku_obj['traits']['sizes']['selectedSize'])
+                        loader.add_value(field_name_part + '_values', parent_details['attributes']['sizes']['sizeMap'][selected_size]['name'])
+
+
+        loader.add_value('store', parent_details['store'])
+        loader.add_value('name', parent_details['name'])
+        loader.add_value('brand', parent_details['brand'])
+        loader.add_value('tax_status', parent_details['tax_status'])
+        loader.add_value('in_stock', 1 if sku_obj['availability']['available'] else 0)
+        loader.add_value('backorders_allowed', parent_details['backorders_allowed'])
+        loader.add_value('wp_published', parent_details['wp_published'])
+        loader.add_value('wp_featured', parent_details['wp_featured'])
+        loader.add_value('wp_visibility', parent_details['wp_visibility'])
+
+        original_price_in_usd = parent_details['original_price_in_usd']
+
+        category, weight, profit_margin_rate, estimated_shipping_cost_in_usd, estimated_profit_in_usd, final_price_in_usd, final_price_in_npr = self.map_and_calculate(store='Macys', category_list=category_list, original_price_in_usd=original_price_in_usd)
+        loader.add_value('category', category)
+        loader.add_value('weight', weight)
+        loader.add_value('profit_margin_rate', profit_margin_rate)
+        loader.add_value('original_price_in_usd', original_price_in_usd)
+        loader.add_value('estimated_shipping_cost_in_usd', estimated_shipping_cost_in_usd)
+        loader.add_value('estimated_profit_in_usd', estimated_profit_in_usd)
+        loader.add_value('final_price_in_usd', final_price_in_usd)
+        loader.add_value('final_price_in_npr', final_price_in_npr)
+            
+        loader.add_value('picture_urls', ','.join(picture_urls))
+
+        loader.load_item()
+        return loader
+
+
     def parse_sephora(self, product_url, html_dump):
         loaders = []
 
@@ -283,5 +394,5 @@ class ProductItemLoader(ItemLoader):
         return item_category_hierarchy, item_weight, item_profit_margin_rate, item_estimated_shipping_cost_in_usd, item_estimated_profit_in_usd, item_final_price_in_usd, item_final_price_in_npr
 
     def usd_to_npr(self, usd_price):
-        return roundup_to_hundred(float(usd_price) * 112)
+        return roundup_to_hundred(float(usd_price) * 115)
 

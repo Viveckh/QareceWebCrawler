@@ -13,7 +13,9 @@ class ProductsSpider(scrapy.Spider):
         request_url = str(response.request.url).lower()
         
         if 'macys.com' in request_url: 
-            yield self.productItemLoader.parse_macys(product_url=request_url, html_dump=response)
+            loaders = self.productItemLoader.parse_macys(product_url=request_url, html_dump=response)
+            for loader in loaders:
+                yield loader.item
         elif 'kyliecosmetics.com' in request_url:
             yield self.productItemLoader.parse_kylie_cosmetics(product_url=request_url, html_dump=response)
         elif 'sephora.com' in request_url:
