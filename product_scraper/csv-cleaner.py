@@ -2,7 +2,7 @@ import pandas as pd
 
 products_df = pd.read_csv('./product_scraper/output/Product.csv', index_col=False)
 
-print(products_df.info())
+# print(products_df.info())
 
 products_df = products_df[[
     'wp_product_type', 

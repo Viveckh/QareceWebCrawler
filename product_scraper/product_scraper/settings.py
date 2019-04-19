@@ -32,6 +32,10 @@ FEED_EXPORTERS = {
     'custom_csv': 'product_scraper.exporters.CsvOptionRespectingItemExporter'
 }
 
+# LOGGERS
+LOG_LEVEL = 'ERROR'
+LOG_FILE = 'product_scraper/output/errors.txt'
+
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
 
