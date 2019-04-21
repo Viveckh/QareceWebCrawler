@@ -27,6 +27,7 @@ Development rates are on a hourly basis or project basis depending on your needs
 * Make sure you have Python, Scrapy and Pandas installed in your system
 * Add the urls of products you want to crawl by going to `/product_scraper/product_scraper/input/urls.txt`. Check the supported e-commerce stores above.
 * Navigate back to the base of the scraper where the scrapy.cfg file is. `cd /product_scraper`
+* `python setup.py`
 * `scrapy crawl products-scraper`
 * `python csv-cleaner.py`
 * The output file to upload in woocommerce is ready at `/product_scraper/product_scraper/output/Product-formatted-for-wp.csv`

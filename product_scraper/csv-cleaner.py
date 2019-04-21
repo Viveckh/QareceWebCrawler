@@ -96,4 +96,17 @@ print(products_df.info())
 
 products_df.to_csv('./product_scraper/output/Product-formatted-for-wp.csv', index=False)
 
+## Reformatting error file
+try:
+    category_mapping_errors_df = pd.read_csv('./product_scraper/output/category_mapping_errors.csv', header=None, index_col=False)
+    category_mapping_errors_df.drop_duplicates(keep='first', inplace=True)
+    category_mapping_errors_df.to_csv('./product_scraper/output/category_mapping_errors.csv', header=False, index=False)
+except:
+    print("We got some errors while reformatting category mapping error file")
 
+try:
+    profit_mapping_errors_df = pd.read_csv('./product_scraper/output/profit_mapping_errors.csv', header=None, index_col=False)
+    profit_mapping_errors_df.drop_duplicates(keep='first', inplace=True)
+    profit_mapping_errors_df.to_csv('./product_scraper/output/profit_mapping_errors.csv', header=False, index=False)
+except:
+    print("We got some errors while reformatting profit mapping error file")

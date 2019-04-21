@@ -15,6 +15,9 @@ class ProductItemLoader(ItemLoader):
     category_mapping_df.fillna(value='', inplace=True)
     profit_margin_mapping_df.fillna(value='', inplace=True)
 
+    f_category_mapping_errors = open(os.path.dirname(__file__) + "/output/category_mapping_errors.csv", "a")
+    f_profit_mapping_errors = open(os.path.dirname(__file__) + "/output/profit_mapping_errors.csv", "a")
+
     def parse_kylie_cosmetics(self, product_url, html_dump):
         loader = ProductItemLoader(item=Product(), selector=html_dump)
 
@@ -78,7 +81,10 @@ class ProductItemLoader(ItemLoader):
             shared_product_details['wp_featured'] = 0
             shared_product_details['wp_visibility'] = 'visible'
             shared_product_details['base_image_urls'] = product['urlTemplate']
-            upcs_list = dict(product['relationships']['upcs']).keys()
+            if 'upcs' in product['relationships']:
+                upcs_list = dict(product['relationships']['upcs']).keys()
+            else:
+                upcs_list = dict(product['relationships']['memberProductMap']).keys()
             if len(upcs_list) > 1:
                 is_variable_product = True
                 shared_product_details['attributes'] = {}
@@ -103,7 +109,10 @@ class ProductItemLoader(ItemLoader):
 
             if is_variable_product:
                 for upcs in upcs_list:
-                    child_sku_obj = product['relationships']['upcs'][upcs]
+                    if 'upcs' in product['relationships']:
+                        child_sku_obj = product['relationships']['upcs'][upcs]
+                    else:
+                        child_sku_obj = product['relationships']['memberProductMap'][upcs]
                     loaders.append(self.gather_macys_variation(sku_obj=child_sku_obj, parent_details=shared_product_details, category_list=macys_category_list, is_parent=False, is_variable=True))
 
         return loaders
@@ -361,6 +370,7 @@ class ProductItemLoader(ItemLoader):
                             (self.category_mapping_df['s_subcategory2'].str.strip().str.lower() == str(padded_category_list[3]).strip().lower())]
         
         if cat_match_df.empty:
+            self.f_category_mapping_errors.write(store + "," + ",".join(padded_category_list) + "\n")
             raise Exception("Could not find a qarece mapping in category mapping file for %s store's category hierarchy %s" % (store, padded_category_list))
         
         # Only get the first record if there are multiple matches
@@ -379,13 +389,14 @@ class ProductItemLoader(ItemLoader):
                                                                 (self.profit_margin_mapping_df['q_subcategory2'].str.strip().str.lower() == str(cat_match_df['q_subcategory2']).strip().lower())]
 
         if bizrules_match_df.empty:
+            self.f_profit_mapping_errors.write(",".join(qarece_category_list) + "\n")
             raise Exception("Could not find qarece category mapping in profit margin file for hierarchy of %s" % (qarece_category_list))
         
         # There should be only one match, if multiple, then there is an error within the file
         # Calculate final values to return
         item_weight = float(bizrules_match_df['avg_weight'])
-        item_profit_margin_rate = .50
-        item_estimated_shipping_cost_in_usd = item_weight * 5
+        item_profit_margin_rate = .38
+        item_estimated_shipping_cost_in_usd = max(item_weight * 5, 5)
         item_estimated_profit_in_usd = original_price_in_usd * item_profit_margin_rate
         item_final_price_in_usd = original_price_in_usd + item_estimated_shipping_cost_in_usd + item_estimated_profit_in_usd
         item_final_price_in_npr = self.usd_to_npr(item_final_price_in_usd)
