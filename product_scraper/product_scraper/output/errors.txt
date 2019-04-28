@@ -43205,3 +43205,72 @@ Traceback (most recent call last):
   File "/Users/sujilmaharjan/Desktop/qarece-web-crawler/product_scraper/product_scraper/itemloaders.py", line 87, in parse_macys
     upcs_list = dict(product['relationships']['memberProductMap']).keys()
 KeyError: 'memberProductMap'
+2019-04-28 13:37:51 [scrapy.core.scraper] ERROR: Spider error processing <GET https://www.macys.com/shop/product/perry-ellis-suiting-driver?ID=8796904&CategoryID=197651> (referer: None)
+Traceback (most recent call last):
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/utils/defer.py", line 102, in iter_errback
+    yield next(it)
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/offsite.py", line 30, in process_spider_output
+    for x in result:
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/middlewares.py", line 35, in process_spider_output
+    for i in result:
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/referer.py", line 339, in <genexpr>
+    return (_set_referer(r) for r in result or ())
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/urllength.py", line 37, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/depth.py", line 58, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/spiders/products.py", line 16, in parse
+    loaders = self.productItemLoader.parse_macys(product_url=request_url, html_dump=response)
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/itemloaders.py", line 108, in parse_macys
+    loaders.append(self.gather_macys_variation(sku_obj=product, parent_details=shared_product_details, category_list=macys_category_list, is_parent=True, is_variable=is_variable_product))
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/itemloaders.py", line 199, in gather_macys_variation
+    category, weight, profit_margin_rate, estimated_shipping_cost_in_usd, estimated_profit_in_usd, final_price_in_usd, final_price_in_npr = self.map_and_calculate(store='Macys', category_list=category_list, original_price_in_usd=original_price_in_usd)
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/itemloaders.py", line 374, in map_and_calculate
+    raise Exception("Could not find a qarece mapping in category mapping file for %s store's category hierarchy %s" % (store, padded_category_list))
+Exception: Could not find a qarece mapping in category mapping file for Macys store's category hierarchy ['Men', 'Hats, Gloves & Scarves', '', '']
+2019-04-28 13:39:40 [scrapy.core.scraper] ERROR: Spider error processing <GET https://www.macys.com/shop/product/perry-ellis-suiting-driver?ID=8796904&CategoryID=197651> (referer: None)
+Traceback (most recent call last):
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/utils/defer.py", line 102, in iter_errback
+    yield next(it)
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/offsite.py", line 30, in process_spider_output
+    for x in result:
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/middlewares.py", line 35, in process_spider_output
+    for i in result:
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/referer.py", line 339, in <genexpr>
+    return (_set_referer(r) for r in result or ())
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/urllength.py", line 37, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/depth.py", line 58, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/spiders/products.py", line 16, in parse
+    loaders = self.productItemLoader.parse_macys(product_url=request_url, html_dump=response)
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/itemloaders.py", line 108, in parse_macys
+    loaders.append(self.gather_macys_variation(sku_obj=product, parent_details=shared_product_details, category_list=macys_category_list, is_parent=True, is_variable=is_variable_product))
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/itemloaders.py", line 199, in gather_macys_variation
+    category, weight, profit_margin_rate, estimated_shipping_cost_in_usd, estimated_profit_in_usd, final_price_in_usd, final_price_in_npr = self.map_and_calculate(store='Macys', category_list=category_list, original_price_in_usd=original_price_in_usd)
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/itemloaders.py", line 374, in map_and_calculate
+    raise Exception("Could not find a qarece mapping in category mapping file for %s store's category hierarchy %s" % (store, padded_category_list))
+Exception: Could not find a qarece mapping in category mapping file for Macys store's category hierarchy ['Men', 'Hats, Gloves & Scarves', '', '']
+2019-04-28 13:40:49 [scrapy.core.scraper] ERROR: Spider error processing <GET https://www.macys.com/shop/product/perry-ellis-suiting-driver?ID=8796904&CategoryID=197651> (referer: None)
+Traceback (most recent call last):
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/utils/defer.py", line 102, in iter_errback
+    yield next(it)
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/offsite.py", line 30, in process_spider_output
+    for x in result:
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/middlewares.py", line 35, in process_spider_output
+    for i in result:
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/referer.py", line 339, in <genexpr>
+    return (_set_referer(r) for r in result or ())
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/urllength.py", line 37, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/depth.py", line 58, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/spiders/products.py", line 16, in parse
+    loaders = self.productItemLoader.parse_macys(product_url=request_url, html_dump=response)
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/itemloaders.py", line 108, in parse_macys
+    loaders.append(self.gather_macys_variation(sku_obj=product, parent_details=shared_product_details, category_list=macys_category_list, is_parent=True, is_variable=is_variable_product))
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/itemloaders.py", line 199, in gather_macys_variation
+    category, weight, profit_margin_rate, estimated_shipping_cost_in_usd, estimated_profit_in_usd, final_price_in_usd, final_price_in_npr = self.map_and_calculate(store='Macys', category_list=category_list, original_price_in_usd=original_price_in_usd)
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/itemloaders.py", line 374, in map_and_calculate
+    raise Exception("Could not find a qarece mapping in category mapping file for %s store's category hierarchy %s" % (store, padded_category_list))
+Exception: Could not find a qarece mapping in category mapping file for Macys store's category hierarchy ['Men', 'Hats, Gloves & Scarves', '', '']
