@@ -370,7 +370,7 @@ class ProductItemLoader(ItemLoader):
                             (self.category_mapping_df['s_subcategory2'].str.strip().str.lower() == str(padded_category_list[3]).strip().lower())]
         
         if cat_match_df.empty:
-            self.f_category_mapping_errors.write(store + "," + ",".join(padded_category_list) + "\n")
+            self.f_category_mapping_errors.write('"{0}"'.format(store) + "," + ",".join('"{0}"'.format(item) for item in padded_category_list) + "\n")
             raise Exception("Could not find a qarece mapping in category mapping file for %s store's category hierarchy %s" % (store, padded_category_list))
         
         # Only get the first record if there are multiple matches
@@ -389,13 +389,13 @@ class ProductItemLoader(ItemLoader):
                                                                 (self.profit_margin_mapping_df['q_subcategory2'].str.strip().str.lower() == str(cat_match_df['q_subcategory2']).strip().lower())]
 
         if bizrules_match_df.empty:
-            self.f_profit_mapping_errors.write(",".join(qarece_category_list) + "\n")
+            self.f_profit_mapping_errors.write(",".join('"{0}"'.format(item) for item in qarece_category_list) + "\n")
             raise Exception("Could not find qarece category mapping in profit margin file for hierarchy of %s" % (qarece_category_list))
         
         # There should be only one match, if multiple, then there is an error within the file
         # Calculate final values to return
         item_weight = float(bizrules_match_df['avg_weight'])
-        item_profit_margin_rate = .38
+        item_profit_margin_rate = .20
         item_estimated_shipping_cost_in_usd = max(item_weight * 5, 5)
         item_estimated_profit_in_usd = original_price_in_usd * item_profit_margin_rate
         item_final_price_in_usd = original_price_in_usd + item_estimated_shipping_cost_in_usd + item_estimated_profit_in_usd
@@ -405,5 +405,5 @@ class ProductItemLoader(ItemLoader):
         return item_category_hierarchy, item_weight, item_profit_margin_rate, item_estimated_shipping_cost_in_usd, item_estimated_profit_in_usd, item_final_price_in_usd, item_final_price_in_npr
 
     def usd_to_npr(self, usd_price):
-        return roundup_to_hundred(float(usd_price) * 115)
+        return roundup_to_hundred(float(usd_price) * 112)
 
