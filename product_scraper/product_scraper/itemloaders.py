@@ -395,7 +395,7 @@ class ProductItemLoader(ItemLoader):
         # There should be only one match, if multiple, then there is an error within the file
         # Calculate final values to return
         item_weight = float(bizrules_match_df['avg_weight'])
-        item_profit_margin_rate = .20
+        item_profit_margin_rate = .30
         item_estimated_shipping_cost_in_usd = max(item_weight * 5, 5)
         item_estimated_profit_in_usd = original_price_in_usd * item_profit_margin_rate
         item_final_price_in_usd = original_price_in_usd + item_estimated_shipping_cost_in_usd + item_estimated_profit_in_usd
