@@ -1,0 +1,266 @@
+2019-06-10 12:57:38 [scrapy.core.scraper] ERROR: Spider error processing <GET https://www.sephora.com/product/mothership-v-eyeshadow-palette-P86825294?icid2=products%20grid:p86825294> (referer: None)
+Traceback (most recent call last):
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/utils/defer.py", line 102, in iter_errback
+    yield next(it)
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/offsite.py", line 30, in process_spider_output
+    for x in result:
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/middlewares.py", line 35, in process_spider_output
+    for i in result:
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/referer.py", line 339, in <genexpr>
+    return (_set_referer(r) for r in result or ())
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/urllength.py", line 37, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/depth.py", line 58, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/spiders/products.py", line 22, in parse
+    loaders = self.productItemLoader.parse_sephora(product_url=request_url, html_dump=response)
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/itemloaders.py", line 238, in parse_sephora
+    shared_product_details['short_description'] = product['quickLookDescription']
+KeyError: 'quickLookDescription'
+2019-06-10 12:57:52 [scrapy.core.scraper] ERROR: Spider error processing <GET https://www.sephora.com/product/prep-perfect-skin-long-wear-customizable-set-P445416?icid2=products%20grid:p445416> (referer: None)
+Traceback (most recent call last):
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/utils/defer.py", line 102, in iter_errback
+    yield next(it)
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/offsite.py", line 30, in process_spider_output
+    for x in result:
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/middlewares.py", line 35, in process_spider_output
+    for i in result:
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/referer.py", line 339, in <genexpr>
+    return (_set_referer(r) for r in result or ())
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/urllength.py", line 37, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/depth.py", line 58, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/spiders/products.py", line 22, in parse
+    loaders = self.productItemLoader.parse_sephora(product_url=request_url, html_dump=response)
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/itemloaders.py", line 247, in parse_sephora
+    shared_product_details['attributes'][product['variationType']] = [(obj.get('variationValue', '') + ' ' + obj.get('variationDesc', '')) for obj in product['regularChildSkus'] if obj['variationType'] == product['variationType']]
+KeyError: 'regularChildSkus'
+2019-06-10 12:58:06 [scrapy.core.scraper] ERROR: Spider error processing <GET https://www.sephora.com/product/lock-it-foundation-kit-P432848?icid2=products%20grid:p432848> (referer: None)
+Traceback (most recent call last):
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/utils/defer.py", line 102, in iter_errback
+    yield next(it)
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/offsite.py", line 30, in process_spider_output
+    for x in result:
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/middlewares.py", line 35, in process_spider_output
+    for i in result:
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/referer.py", line 339, in <genexpr>
+    return (_set_referer(r) for r in result or ())
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/urllength.py", line 37, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/depth.py", line 58, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/spiders/products.py", line 22, in parse
+    loaders = self.productItemLoader.parse_sephora(product_url=request_url, html_dump=response)
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/itemloaders.py", line 247, in parse_sephora
+    shared_product_details['attributes'][product['variationType']] = [(obj.get('variationValue', '') + ' ' + obj.get('variationDesc', '')) for obj in product['regularChildSkus'] if obj['variationType'] == product['variationType']]
+KeyError: 'regularChildSkus'
+2019-06-10 12:58:23 [scrapy.core.scraper] ERROR: Spider error processing <GET https://www.sephora.com/product/limitless-foundation-customizable-set-P442811?icid2=products%20grid:p442811> (referer: None)
+Traceback (most recent call last):
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/utils/defer.py", line 102, in iter_errback
+    yield next(it)
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/offsite.py", line 30, in process_spider_output
+    for x in result:
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/middlewares.py", line 35, in process_spider_output
+    for i in result:
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/referer.py", line 339, in <genexpr>
+    return (_set_referer(r) for r in result or ())
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/urllength.py", line 37, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/depth.py", line 58, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/spiders/products.py", line 22, in parse
+    loaders = self.productItemLoader.parse_sephora(product_url=request_url, html_dump=response)
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/itemloaders.py", line 247, in parse_sephora
+    shared_product_details['attributes'][product['variationType']] = [(obj.get('variationValue', '') + ' ' + obj.get('variationDesc', '')) for obj in product['regularChildSkus'] if obj['variationType'] == product['variationType']]
+KeyError: 'regularChildSkus'
+2019-06-10 12:59:04 [scrapy.core.scraper] ERROR: Spider error processing <GET https://www.sephora.com/product/metallic-eye-lip-crayon-P78731877?skuId=2144640&icid2=products%20grid:p78731877> (referer: None)
+Traceback (most recent call last):
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/utils/defer.py", line 102, in iter_errback
+    yield next(it)
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/offsite.py", line 30, in process_spider_output
+    for x in result:
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/middlewares.py", line 35, in process_spider_output
+    for i in result:
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/referer.py", line 339, in <genexpr>
+    return (_set_referer(r) for r in result or ())
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/urllength.py", line 37, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/depth.py", line 58, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/spiders/products.py", line 22, in parse
+    loaders = self.productItemLoader.parse_sephora(product_url=request_url, html_dump=response)
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/itemloaders.py", line 247, in parse_sephora
+    shared_product_details['attributes'][product['variationType']] = [(obj.get('variationValue', '') + ' ' + obj.get('variationDesc', '')) for obj in product['regularChildSkus'] if obj['variationType'] == product['variationType']]
+KeyError: 'regularChildSkus'
+2019-06-10 12:59:06 [scrapy.core.scraper] ERROR: Spider error processing <GET https://www.sephora.com/product/frosted-metal-lipstick-P09784333?skuId=2144608&icid2=products%20grid:p09784333> (referer: None)
+Traceback (most recent call last):
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/utils/defer.py", line 102, in iter_errback
+    yield next(it)
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/offsite.py", line 30, in process_spider_output
+    for x in result:
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/middlewares.py", line 35, in process_spider_output
+    for i in result:
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/referer.py", line 339, in <genexpr>
+    return (_set_referer(r) for r in result or ())
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/urllength.py", line 37, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/depth.py", line 58, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/spiders/products.py", line 22, in parse
+    loaders = self.productItemLoader.parse_sephora(product_url=request_url, html_dump=response)
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/itemloaders.py", line 247, in parse_sephora
+    shared_product_details['attributes'][product['variationType']] = [(obj.get('variationValue', '') + ' ' + obj.get('variationDesc', '')) for obj in product['regularChildSkus'] if obj['variationType'] == product['variationType']]
+KeyError: 'regularChildSkus'
+2019-06-10 12:59:14 [scrapy.core.scraper] ERROR: Spider error processing <GET https://www.sephora.com/product/beauty-basics-custom-set-P415303?icid2=products%20grid:p415303> (referer: None)
+Traceback (most recent call last):
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/utils/defer.py", line 102, in iter_errback
+    yield next(it)
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/offsite.py", line 30, in process_spider_output
+    for x in result:
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/middlewares.py", line 35, in process_spider_output
+    for i in result:
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/referer.py", line 339, in <genexpr>
+    return (_set_referer(r) for r in result or ())
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/urllength.py", line 37, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/depth.py", line 58, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/spiders/products.py", line 22, in parse
+    loaders = self.productItemLoader.parse_sephora(product_url=request_url, html_dump=response)
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/itemloaders.py", line 247, in parse_sephora
+    shared_product_details['attributes'][product['variationType']] = [(obj.get('variationValue', '') + ' ' + obj.get('variationDesc', '')) for obj in product['regularChildSkus'] if obj['variationType'] == product['variationType']]
+KeyError: 'regularChildSkus'
+2019-06-10 12:59:17 [scrapy.core.scraper] ERROR: Spider error processing <GET https://www.sephora.com/product/house-lashes-x-sephora-collection-versailles-eyeshadow-palette-P417887?icid2=products%20grid:p417887> (referer: None)
+Traceback (most recent call last):
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/utils/defer.py", line 102, in iter_errback
+    yield next(it)
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/offsite.py", line 30, in process_spider_output
+    for x in result:
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/middlewares.py", line 35, in process_spider_output
+    for i in result:
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/referer.py", line 339, in <genexpr>
+    return (_set_referer(r) for r in result or ())
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/urllength.py", line 37, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/depth.py", line 58, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/spiders/products.py", line 22, in parse
+    loaders = self.productItemLoader.parse_sephora(product_url=request_url, html_dump=response)
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/itemloaders.py", line 247, in parse_sephora
+    shared_product_details['attributes'][product['variationType']] = [(obj.get('variationValue', '') + ' ' + obj.get('variationDesc', '')) for obj in product['regularChildSkus'] if obj['variationType'] == product['variationType']]
+KeyError: 'regularChildSkus'
+2019-06-10 12:59:20 [scrapy.core.scraper] ERROR: Spider error processing <GET https://www.sephora.com/product/house-lashes-x-sephora-collection-secret-garden-eyeshadow-palette-P417888?icid2=products%20grid:p417888> (referer: None)
+Traceback (most recent call last):
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/utils/defer.py", line 102, in iter_errback
+    yield next(it)
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/offsite.py", line 30, in process_spider_output
+    for x in result:
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/middlewares.py", line 35, in process_spider_output
+    for i in result:
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/referer.py", line 339, in <genexpr>
+    return (_set_referer(r) for r in result or ())
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/urllength.py", line 37, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/depth.py", line 58, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/spiders/products.py", line 22, in parse
+    loaders = self.productItemLoader.parse_sephora(product_url=request_url, html_dump=response)
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/itemloaders.py", line 247, in parse_sephora
+    shared_product_details['attributes'][product['variationType']] = [(obj.get('variationValue', '') + ' ' + obj.get('variationDesc', '')) for obj in product['regularChildSkus'] if obj['variationType'] == product['variationType']]
+KeyError: 'regularChildSkus'
+2019-06-10 12:59:25 [scrapy.core.scraper] ERROR: Spider error processing <GET https://www.sephora.com/product/becca-x-chrissy-teigen-glow-face-palette-P17897458?icid2=products%20grid:p17897458> (referer: None)
+Traceback (most recent call last):
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/utils/defer.py", line 102, in iter_errback
+    yield next(it)
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/offsite.py", line 30, in process_spider_output
+    for x in result:
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/middlewares.py", line 35, in process_spider_output
+    for i in result:
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/referer.py", line 339, in <genexpr>
+    return (_set_referer(r) for r in result or ())
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/urllength.py", line 37, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/depth.py", line 58, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/spiders/products.py", line 22, in parse
+    loaders = self.productItemLoader.parse_sephora(product_url=request_url, html_dump=response)
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/itemloaders.py", line 247, in parse_sephora
+    shared_product_details['attributes'][product['variationType']] = [(obj.get('variationValue', '') + ' ' + obj.get('variationDesc', '')) for obj in product['regularChildSkus'] if obj['variationType'] == product['variationType']]
+KeyError: 'regularChildSkus'
+2019-06-10 12:59:33 [scrapy.core.scraper] ERROR: Spider error processing <GET https://www.sephora.com/product/museum-ice-cream-x-sephora-collection-P437006?icid2=products%20grid:p437006> (referer: None)
+Traceback (most recent call last):
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/utils/defer.py", line 102, in iter_errback
+    yield next(it)
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/offsite.py", line 30, in process_spider_output
+    for x in result:
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/middlewares.py", line 35, in process_spider_output
+    for i in result:
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/referer.py", line 339, in <genexpr>
+    return (_set_referer(r) for r in result or ())
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/urllength.py", line 37, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/depth.py", line 58, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/spiders/products.py", line 22, in parse
+    loaders = self.productItemLoader.parse_sephora(product_url=request_url, html_dump=response)
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/itemloaders.py", line 247, in parse_sephora
+    shared_product_details['attributes'][product['variationType']] = [(obj.get('variationValue', '') + ' ' + obj.get('variationDesc', '')) for obj in product['regularChildSkus'] if obj['variationType'] == product['variationType']]
+KeyError: 'regularChildSkus'
+2019-06-10 12:59:37 [scrapy.core.scraper] ERROR: Spider error processing <GET https://www.sephora.com/product/limited-edition-starlust-lipgloss-trio-P437079?icid2=products%20grid:p437079> (referer: None)
+Traceback (most recent call last):
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/utils/defer.py", line 102, in iter_errback
+    yield next(it)
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/offsite.py", line 30, in process_spider_output
+    for x in result:
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/middlewares.py", line 35, in process_spider_output
+    for i in result:
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/referer.py", line 339, in <genexpr>
+    return (_set_referer(r) for r in result or ())
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/urllength.py", line 37, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/depth.py", line 58, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/spiders/products.py", line 22, in parse
+    loaders = self.productItemLoader.parse_sephora(product_url=request_url, html_dump=response)
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/itemloaders.py", line 247, in parse_sephora
+    shared_product_details['attributes'][product['variationType']] = [(obj.get('variationValue', '') + ' ' + obj.get('variationDesc', '')) for obj in product['regularChildSkus'] if obj['variationType'] == product['variationType']]
+KeyError: 'regularChildSkus'
+2019-06-10 12:59:49 [scrapy.core.scraper] ERROR: Spider error processing <GET https://www.sephora.com/product/funfetti-set-P437710?icid2=products%20grid:p437710> (referer: None)
+Traceback (most recent call last):
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/utils/defer.py", line 102, in iter_errback
+    yield next(it)
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/offsite.py", line 30, in process_spider_output
+    for x in result:
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/middlewares.py", line 35, in process_spider_output
+    for i in result:
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/referer.py", line 339, in <genexpr>
+    return (_set_referer(r) for r in result or ())
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/urllength.py", line 37, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/depth.py", line 58, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/spiders/products.py", line 22, in parse
+    loaders = self.productItemLoader.parse_sephora(product_url=request_url, html_dump=response)
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/itemloaders.py", line 247, in parse_sephora
+    shared_product_details['attributes'][product['variationType']] = [(obj.get('variationValue', '') + ' ' + obj.get('variationDesc', '')) for obj in product['regularChildSkus'] if obj['variationType'] == product['variationType']]
+KeyError: 'regularChildSkus'
+2019-06-10 12:59:52 [scrapy.core.scraper] ERROR: Spider error processing <GET https://www.sephora.com/product/mini-fairy-bomb-P14741473?icid2=products%20grid:p14741473> (referer: None)
+Traceback (most recent call last):
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/utils/defer.py", line 102, in iter_errback
+    yield next(it)
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/offsite.py", line 30, in process_spider_output
+    for x in result:
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/middlewares.py", line 35, in process_spider_output
+    for i in result:
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/referer.py", line 339, in <genexpr>
+    return (_set_referer(r) for r in result or ())
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/urllength.py", line 37, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/Users/viveckh/anaconda3/lib/python3.7/site-packages/scrapy/spidermiddlewares/depth.py", line 58, in <genexpr>
+    return (r for r in result or () if _filter(r))
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/spiders/products.py", line 22, in parse
+    loaders = self.productItemLoader.parse_sephora(product_url=request_url, html_dump=response)
+  File "/CodeForLyf/qarece-web-crawler/product_scraper/product_scraper/itemloaders.py", line 247, in parse_sephora
+    shared_product_details['attributes'][product['variationType']] = [(obj.get('variationValue', '') + ' ' + obj.get('variationDesc', '')) for obj in product['regularChildSkus'] if obj['variationType'] == product['variationType']]
+KeyError: 'regularChildSkus'
