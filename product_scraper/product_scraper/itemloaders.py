@@ -7,6 +7,7 @@ import re
 import json
 import pandas as pd
 from product_scraper.utilities import roundup_to_hundred
+import urllib.parse as urlparse
 
 class ProductItemLoader(ItemLoader):
 
@@ -17,6 +18,7 @@ class ProductItemLoader(ItemLoader):
 
     f_category_mapping_errors = open(os.path.dirname(__file__) + "/output/category_mapping_errors.csv", "a")
     f_profit_mapping_errors = open(os.path.dirname(__file__) + "/output/profit_mapping_errors.csv", "a")
+    f_products_to_unpublish = open(os.path.dirname(__file__) + "/output/products_to_unpublish.csv", "a")
 
     def parse_kylie_cosmetics(self, product_url, html_dump):
         loader = ProductItemLoader(item=Product(), selector=html_dump)
@@ -57,63 +59,70 @@ class ProductItemLoader(ItemLoader):
     def parse_macys(self, product_url, html_dump):
         loaders = []
 
-        hxs = Selector(html_dump)
-        json_dump = hxs.select('//script[contains(@data-bootstrap, "feature/product")]/text()').extract()[0]
-        data = json.loads(json_dump)
+        try:
+            hxs = Selector(html_dump)
+            json_dump = hxs.select('//script[contains(@data-bootstrap, "feature/product")]/text()').extract()[0]
+            data = json.loads(json_dump)
+        
+            # Pretty much all the info we need is within the product node, so lets take that
+            product = data['product']
+        
+            if product is not None:
+                shared_product_details = {}
+                shared_product_details['product_url'] = "https://www.macys.com" + product['identifier']['productUrl']
+                shared_product_details['product_id'] = 'macys-' + str(product['id'])
+                shared_product_details['sku'] = 'macys-' + str(product['id'])
+                shared_product_details['store'] = 'Macys'
+                shared_product_details['name'] = product['detail']['name']
+                shared_product_details['brand'] = product['detail']['brand']['name']
+                shared_product_details['description'] = '<p>' + product['detail']['description'] + '</p>' + (('<ul><li>' + '</li><li>'.join(list(product['detail']['bulletText'])) + '</li><ul>') if 'bulletText' in product['detail'] else '')
+                shared_product_details['short_description'] = product['detail']['description']
+                shared_product_details['tax_status'] = 'taxable'
+                shared_product_details['in_stock'] = 1
+                shared_product_details['backorders_allowed'] = 0
+                shared_product_details['wp_published'] = 1
+                shared_product_details['wp_featured'] = 0
+                shared_product_details['wp_visibility'] = 'visible'
+                shared_product_details['base_image_urls'] = product['urlTemplate']
+                if 'upcs' in product['relationships']:
+                    upcs_list = dict(product['relationships']['upcs']).keys()
+                else:
+                    upcs_list = dict(product['relationships']['memberProductMap']).keys()
+                if len(upcs_list) > 1:
+                    is_variable_product = True
+                    shared_product_details['attributes'] = {}
+                    # Extract all keys from the traits node, exclude keys that are only a mapping and not an attribute
+                    temp_valid_attrs = list(filter(lambda val: val != 'traitsMaps', dict(product['traits']).keys()))
+                    shared_product_details['attributes_list'] = temp_valid_attrs
+                    for attr in temp_valid_attrs:
+                        shared_product_details['attributes'][attr] = product['traits'][attr]
+                else:
+                    is_variable_product = False
+                
+                # Retrieve categories
+                macys_category_list = []
+                for category in data['product']['relationships']['taxonomy']['categories']:
+                    macys_category_list.append(category['name'])
 
-        # Pretty much all the info we need is within the product node, so lets take that
-        product = data['product']
+                # The price will be the same for all variations of a product
+                prices = [float(obj['value']) for obj in data['product']['pricing']['price']['tieredPrice'][0]['values']]
+                shared_product_details['original_price_in_usd'] = max(prices)
+                
+                loaders.append(self.gather_macys_variation(sku_obj=product, parent_details=shared_product_details, category_list=macys_category_list, is_parent=True, is_variable=is_variable_product))
 
-        if product is not None:
-            shared_product_details = {}
-            shared_product_details['product_url'] = "https://www.macys.com" + product['identifier']['productUrl']
-            shared_product_details['product_id'] = 'macys-' + str(product['id'])
-            shared_product_details['sku'] = 'macys-' + str(product['id'])
-            shared_product_details['store'] = 'Macys'
-            shared_product_details['name'] = product['detail']['name']
-            shared_product_details['brand'] = product['detail']['brand']['name']
-            shared_product_details['description'] = '<p>' + product['detail']['description'] + '</p>' + (('<ul><li>' + '</li><li>'.join(list(product['detail']['bulletText'])) + '</li><ul>') if 'bulletText' in product['detail'] else '')
-            shared_product_details['short_description'] = product['detail']['description']
-            shared_product_details['tax_status'] = 'taxable'
-            shared_product_details['in_stock'] = 1
-            shared_product_details['backorders_allowed'] = 0
-            shared_product_details['wp_published'] = 1
-            shared_product_details['wp_featured'] = 0
-            shared_product_details['wp_visibility'] = 'visible'
-            shared_product_details['base_image_urls'] = product['urlTemplate']
-            if 'upcs' in product['relationships']:
-                upcs_list = dict(product['relationships']['upcs']).keys()
-            else:
-                upcs_list = dict(product['relationships']['memberProductMap']).keys()
-            if len(upcs_list) > 1:
-                is_variable_product = True
-                shared_product_details['attributes'] = {}
-                # Extract all keys from the traits node, exclude keys that are only a mapping and not an attribute
-                temp_valid_attrs = list(filter(lambda val: val != 'traitsMaps', dict(product['traits']).keys()))
-                shared_product_details['attributes_list'] = temp_valid_attrs
-                for attr in temp_valid_attrs:
-                    shared_product_details['attributes'][attr] = product['traits'][attr]
-            else:
-                is_variable_product = False
+                if is_variable_product:
+                    for upcs in upcs_list:
+                        if 'upcs' in product['relationships']:
+                            child_sku_obj = product['relationships']['upcs'][upcs]
+                        else:
+                            child_sku_obj = product['relationships']['memberProductMap'][upcs]
+                        loaders.append(self.gather_macys_variation(sku_obj=child_sku_obj, parent_details=shared_product_details, category_list=macys_category_list, is_parent=False, is_variable=True))
             
-            # Retrieve categories
-            macys_category_list = []
-            for category in data['product']['relationships']['taxonomy']['categories']:
-                macys_category_list.append(category['name'])
-
-            # The price will be the same for all variations of a product
-            prices = [float(obj['value']) for obj in data['product']['pricing']['price']['tieredPrice'][0]['values']]
-            shared_product_details['original_price_in_usd'] = max(prices)
-            
-            loaders.append(self.gather_macys_variation(sku_obj=product, parent_details=shared_product_details, category_list=macys_category_list, is_parent=True, is_variable=is_variable_product))
-
-            if is_variable_product:
-                for upcs in upcs_list:
-                    if 'upcs' in product['relationships']:
-                        child_sku_obj = product['relationships']['upcs'][upcs]
-                    else:
-                        child_sku_obj = product['relationships']['memberProductMap'][upcs]
-                    loaders.append(self.gather_macys_variation(sku_obj=child_sku_obj, parent_details=shared_product_details, category_list=macys_category_list, is_parent=False, is_variable=True))
+            else:
+                self.unpublish_product(product_url, data)
+        except Exception as e:
+            self.unpublish_product(product_url)
+            raise Exception(e)
 
         return loaders
 
@@ -214,50 +223,57 @@ class ProductItemLoader(ItemLoader):
 
     def parse_sephora(self, product_url, html_dump):
         loaders = []
-
-        hxs = Selector(html_dump)
-        json_dump = hxs.select('//script[contains(@id, "linkJSON")]/text()').extract()[0]
-        data = json.loads(json_dump)
-
-        # Sephora returns a list where one of the indexes contains details about the product
-        product = None
-        for obj in data:
-            if 'RegularProductTop' in obj['class']:
-                product = obj['props']['currentProduct']   
-                break
         
-        if product is not None:
-            shared_product_details = {}
-            shared_product_details['product_url'] = product['fullSiteProductUrl']
-            shared_product_details['product_id'] = 'sephora-' + str(product['currentSku']['skuId'])
-            shared_product_details['sku'] = 'sephora-' + str(product['currentSku']['skuId'])
-            shared_product_details['store'] = 'Sephora'
-            shared_product_details['name'] = product['displayName']
-            shared_product_details['brand'] = product['brand']['displayName']
-            shared_product_details['description'] = product['longDescription']
-            shared_product_details['short_description'] = product['quickLookDescription']
-            shared_product_details['tax_status'] = 'taxable'
-            shared_product_details['in_stock'] = 1
-            shared_product_details['backorders_allowed'] = 0
-            shared_product_details['wp_published'] = 1
-            shared_product_details['wp_featured'] = 0
-            shared_product_details['wp_visibility'] = 'visible'
-            if product['variationType'] != 'None':
-                shared_product_details['attributes'] = {}
-                shared_product_details['attributes'][product['variationType']] = [(obj.get('variationValue', '') + ' ' + obj.get('variationDesc', '')) for obj in product['regularChildSkus'] if obj['variationType'] == product['variationType']]
-
-            sephora_category_list = self.recursive_sephora_category_builder(product['parentCategory'])
+        try:
+            hxs = Selector(html_dump)
+            json_dump = hxs.select('//script[contains(@id, "linkJSON")]/text()').extract()[0]
+            data = json.loads(json_dump)
+        
+            # Sephora returns a list where one of the indexes contains details about the product
+            product = None
+            for obj in data:
+                if 'RegularProductTop' in obj['class']:
+                    product = obj['props']['currentProduct']   
+                    break
             
-            if 'regularChildSkus' in product:
-                is_variable_product = True
+            if product is not None:
+                shared_product_details = {}
+                shared_product_details['product_url'] = product['fullSiteProductUrl']
+                shared_product_details['product_id'] = 'sephora-' + str(product['currentSku']['skuId'])
+                shared_product_details['sku'] = 'sephora-' + str(product['currentSku']['skuId'])
+                shared_product_details['store'] = 'Sephora'
+                shared_product_details['name'] = product['displayName']
+                shared_product_details['brand'] = product['brand']['displayName']
+                shared_product_details['description'] = product['longDescription']
+                shared_product_details['short_description'] = product['quickLookDescription']
+                shared_product_details['tax_status'] = 'taxable'
+                shared_product_details['in_stock'] = 1
+                shared_product_details['backorders_allowed'] = 0
+                shared_product_details['wp_published'] = 1
+                shared_product_details['wp_featured'] = 0
+                shared_product_details['wp_visibility'] = 'visible'
+                if product['variationType'] != 'None':
+                    shared_product_details['attributes'] = {}
+                    shared_product_details['attributes'][product['variationType']] = [(obj.get('variationValue', '') + ' ' + obj.get('variationDesc', '')) for obj in product['regularChildSkus'] if obj['variationType'] == product['variationType']]
+
+                sephora_category_list = self.recursive_sephora_category_builder(product['parentCategory'])
+                
+                if 'regularChildSkus' in product:
+                    is_variable_product = True
+                else:
+                    is_variable_product = False
+
+                loaders.append(self.gather_sephora_variation(sku_obj=product['currentSku'], parent_details=shared_product_details, category_list=sephora_category_list, is_parent=True, is_variable=is_variable_product))
+
+                if is_variable_product:
+                    for child_sku_obj in product['regularChildSkus']:
+                        loaders.append(self.gather_sephora_variation(sku_obj=child_sku_obj, parent_details=shared_product_details, category_list=sephora_category_list, is_parent=False, is_variable=True))
+
             else:
-                is_variable_product = False
-
-            loaders.append(self.gather_sephora_variation(sku_obj=product['currentSku'], parent_details=shared_product_details, category_list=sephora_category_list, is_parent=True, is_variable=is_variable_product))
-
-            if is_variable_product:
-                for child_sku_obj in product['regularChildSkus']:
-                    loaders.append(self.gather_sephora_variation(sku_obj=child_sku_obj, parent_details=shared_product_details, category_list=sephora_category_list, is_parent=False, is_variable=True))
+                self.unpublish_product(product_url, data)
+        except Exception as e:
+            self.unpublish_product(product_url)
+            raise Exception(e)
 
         return loaders
 
@@ -404,6 +420,32 @@ class ProductItemLoader(ItemLoader):
 
         return item_category_hierarchy, item_weight, item_profit_margin_rate, item_estimated_shipping_cost_in_usd, item_estimated_profit_in_usd, item_final_price_in_usd, item_final_price_in_npr
 
+    def unpublish_product(self, product_url, data_dump={}):
+        # This part WILL WORK AS LONG AS
+        # the urls being passed were at point extracted by our crawler (from the JSON body of the site)
+        # Because it guarantees that the url will contain the identifying info
+
+        sku = None
+        
+        # Parse the product url
+        parsed = urlparse.urlparse(product_url)
+
+        if 'macys.com' in product_url: 
+            # Find the ID used in data dump
+            id_from_url = urlparse.parse_qs(parsed.query)['id'] # Using lowercase key cause the parse turns everything to lowercase
+            if id_from_url is not None:
+                sku = 'macys-' + " ".join(id_from_url)
+        
+        elif 'sephora.com' in product_url:
+            # Find the ID used in data dump
+            id_from_url = urlparse.parse_qs(parsed.query)['skuid'] # Using lowercase key cause the parse turns everything to lowercase
+            if id_from_url is not None:
+                sku = 'sephora-' + " ".join(id_from_url)
+        
+        # First column is SKU and the second is Published
+        if sku is not None:
+            self.f_products_to_unpublish.write('"{0}"'.format(sku) + "," + '0' + "\n")
+
     def usd_to_npr(self, usd_price):
-        return roundup_to_hundred(float(usd_price) * 112)
+        return roundup_to_hundred(float(usd_price) * 115)
 

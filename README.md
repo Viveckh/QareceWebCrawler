@@ -35,6 +35,11 @@ Development rates are on a hourly basis or project basis depending on your needs
 - Navigate back to the base of the scraper where the scrapy.cfg file is. `cd /product_scraper`
 - `python setup.py`
 - `scrapy crawl products-spider`
-- `python csv-cleaner.py`
-- The output file to upload in woocommerce is ready at `/product_scraper/product_scraper/output/Product-formatted-for-wp.csv`
+- `python clean-scraped-results.py`
+- The output file to upload in woocommerce is ready at `/product_scraper/product_scraper/output/Product-formatted-for-wp.csv`. Run it twice, once in a new products import mode, and again in update mode to update existing products
+- The output file to hide products that are no longer available in market will be ready at `/product_scraper/product_scraper/output/products_to_unpublish.csv`. Run it once in update mode to hide products that exist in your catalog but are not available in the market anymore.
 - Any products that could not be crawled successfully with associated errors will be detailed in `/product_scraper/product_scraper/output/errors.txt`
+
+## TODO
+- An automated way to update catalog in woocommerce using output files without having to upload manually
+- An automated script to prepare `urls.txt` by exporting the catalog from woocommerce in csv, and making a list of product's market urls

@@ -4,6 +4,7 @@ from product_scraper.itemloaders import ProductItemLoader
 
 class ProductsSpider(scrapy.Spider):
     name = 'products-spider'
+    handle_httpstatus_list = [301, 302]
 
     productItemLoader = ProductItemLoader()
     with open(os.path.dirname(__file__) + "/../input/urls.txt", "rt") as f:
