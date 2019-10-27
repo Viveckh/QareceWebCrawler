@@ -1,4 +1,4 @@
-# Qarece Automated E-commerce Catalog Management Web Crawler (AECMWC)
+# Qarece Web Crawler
 
 ## Author: Vivek Pandey
 
