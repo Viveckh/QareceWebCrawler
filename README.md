@@ -1,6 +1,6 @@
 # Qarece Web Crawler
 
-## Author: Vivek Pandey
+## Author: [(EJ) Vivek Pandey](https://viveckh.com)
 
 ## Save hours spent on manually adding and updating products to your e-commerce site and do it in seconds!
 
