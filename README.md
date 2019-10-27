@@ -15,7 +15,7 @@
 
 ## Output Files Customized for Platforms
 
-- Woocommerce (De-Facto)
+- Woocommerce (Default)
 
 ## Important Notes
 
