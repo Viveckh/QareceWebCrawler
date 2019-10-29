@@ -1,6 +1,6 @@
 # Qarece Web Crawler
 
-## Author: [(EJ) Vivek Pandey](https://viveckh.com)
+## Author: [(EJ) Vivek Pandey](https://viveckh.com) / [Sujil Maharjan](https://sujilmaharjan.com) / Arjun Bastola
 
 ## Save hours spent on manually adding and updating products to your e-commerce site and do it in seconds!
 
